@@ -1,0 +1,11 @@
+services:
+  playwright:
+    container_name: tests
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - docker-compose.env
+    volumes:
+      - .:/app
+    network_mode: host
