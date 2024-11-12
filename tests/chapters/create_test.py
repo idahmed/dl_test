@@ -9,17 +9,22 @@ def playwright():
     with sync_playwright() as p:
         yield p
 
-def login(playwright):
+@pytest.fixture
+def browser(playwright):
     browser = playwright.chromium.launch(headless=True)
-    page = browser.new_page()
-    page.goto(BASE_URL + "/login/")
-    assert page.title() == "Login"
-    page.close()
-    
+    yield browser
+    browser.close()
 
-def test_chapters_create(playwright):
-    browser = playwright.chromium.launch(headless=True)
+@pytest.fixture
+def page(browser):
     page = browser.new_page()
+    yield page
+    page.close()
+
+def test_chapters_create(page):
     page.goto(BASE_URL + "/chapters/create/")
     assert page.locator('h2:has-text("Chapters")').is_visible()
-    page.close()
+
+def test_login(page):
+    page.goto(BASE_URL + "/login/")
+    assert page.title() == "Login"
